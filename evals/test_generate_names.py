@@ -9,6 +9,7 @@ import pytest
 
 import app
 from evals.checks import name_list_problems, not_camel_case
+from evals.judge import names_fit_context
 
 
 @pytest.fixture(autouse=True)
@@ -17,13 +18,24 @@ def api_key():
 
 
 @pytest.fixture
-def generate(record_property):
-    def run(category, context, count, banned=()):
+def generate(record_property, monkeypatch):
+    def run(category, context, count, banned=(), judge_fit=False):
+        # Keeps the model's raw answer: the app cuts the list to count, which would hide extra names.
+        replies = []
+        post = app.requests.post
+        monkeypatch.setattr(app.requests, "post", lambda *a, **k: replies.append(post(*a, **k)) or replies[-1])
         names = app.generate_names_with_llm(category, context, count)
+        monkeypatch.undo()
         # Shown in evalship's report, so a change's before and after can be compared.
         record_property("input", json.dumps({"category": category, "context": context, "count": count}))
         record_property("output", json.dumps(names))
         assert name_list_problems(names, count, context, banned) == []
+        raw = json.loads(replies[0].json()["choices"][0]["message"]["content"])
+        assert len(raw) == count, f"the model returned {len(raw)} names, asked for {count}"
+        if judge_fit:
+            fits, reason = names_fit_context(category, context, names)
+            record_property("judge_reason", reason)
+            assert fits, f"the names don't fit the context: {reason}"
         return names
     return run
 
@@ -33,16 +45,16 @@ def test_project_without_context(generate):
 
 
 def test_variable_names_are_camel_case(generate):
-    names = generate("variable", "user session cache", 5)
+    names = generate("variable", "user session cache", 5, judge_fit=True)
     assert not_camel_case(names) == []
 
 
 def test_company_returns_three_names(generate):
-    generate("company", "sustainable energy", 3)
+    generate("company", "sustainable energy", 3, judge_fit=True)
 
 
 def test_pet_returns_ten_names(generate):
-    generate("pet", "orange cat", 10)
+    generate("pet", "orange cat", 10, judge_fit=True)
 
 
 def test_single_name(generate):

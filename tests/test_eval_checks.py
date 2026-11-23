@@ -1,5 +1,6 @@
 """The eval checks on made-up results: right ones pass, wrong ones fail. Calls no model."""
 from evals.checks import name_list_problems, not_camel_case
+from evals.judge import parse_verdict
 
 
 def test_right_answers_pass():
@@ -23,3 +24,13 @@ def test_wrong_answers_fail():
     assert name_list_problems(["The sea is wide", "Waves roll on"], 2, banned=("sea", "wave"))  # short poem lines
     assert not_camel_case(["SessionCache"]) == ["SessionCache"]
     assert not_camel_case(["session_cache", "session cache", "2cache", ""]) == ["session_cache", "session cache", "2cache", ""]
+
+
+def test_judge_verdicts():
+    assert parse_verdict('{"reason": "All names evoke orange fur.", "verdict": "pass"}')[0]
+    assert parse_verdict('```json\n{"reason": "Fits.", "verdict": "pass"}\n```')[0]
+    assert not parse_verdict('{"reason": "Generic names.", "verdict": "fail"}')[0]
+    assert not parse_verdict("These names do not pass.")[0]  # no clear verdict
+    assert not parse_verdict('{"verdict": "pass or fail"}')[0]
+    assert not parse_verdict('["pass"]')[0]
+    assert not parse_verdict("")[0]
