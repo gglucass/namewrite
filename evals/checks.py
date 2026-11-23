@@ -27,7 +27,7 @@ def name_list_problems(names, count, context="", banned=()):
             problems.append(f"not a name (too long): {name!r}")
         elif re.fullmatch(r"name ?\d+", key):
             problems.append(f"the prompt's example echoed back: {name!r}")
-        elif any(word in key for word in banned):
+        elif any(re.search(rf"\b{word}s?\b", key) for word in banned):
             problems.append(f"holds a banned word: {name!r}")
         seen.add(key)
     return problems

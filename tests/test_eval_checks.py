@@ -6,7 +6,7 @@ def test_right_answers_pass():
     assert name_list_problems(["Aurora", "Nexus", "Spark"], 3) == []
     assert name_list_problems(["Mr. Whiskers", "Sir Purrs-a-Lot"], 2, "orange cat") == []
     assert name_list_problems(["Crumb"], 1, "a bakery") == []
-    assert name_list_problems(["Sir Purrs a Lot Jr"], 1, banned=("sea",)) == []
+    assert name_list_problems(["Sir Purrs a Lot Jr", "Chelsea", "Seamus"], 3, banned=("sea",)) == []
     assert not_camel_case(["sessionCache", "cache", "userId2", "httpURLCache"]) == []
 
 
