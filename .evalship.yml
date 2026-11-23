@@ -1,3 +1,11 @@
 gate:
   fail_on_new_failures: true
   fail_on_flaws: true
+monitor:
+  generate-names:
+    - replies
+    - json
+    # A list of strings only: anything else makes app.py fall back to random names.
+    - matches: '^\s*\[\s*"(?:[^"\\]|\\.)*"(?:\s*,\s*"(?:[^"\\]|\\.)*")*\s*\]\s*$'
+    - judge: "Do the names fit the category and the context the user asked for?"
+    - judge: "Does the list hold exactly the number of names the user asked for?"
