@@ -39,6 +39,10 @@ sys.path.insert(0, str(ROOT))
 import app  # noqa: E402  (after the key is in the environment: app reads it at import)
 
 
+def record(name, value):
+    """Stands in for pytest's record_property, which conftest.py puts here during a test."""
+
+
 def ask(category, context, count):
     """Runs the production call. Returns (the names the app got, the model's raw reply)."""
     assert app.OPENROUTER_API_KEY, "OPENROUTER_API_KEY is not set: export it, or add it to a .env in the repo root"
@@ -56,6 +60,9 @@ def ask(category, context, count):
     with pytest.MonkeyPatch.context() as patch:
         patch.setattr(requests, "post", spy)
         names = app.generate_names_with_llm(category, context, count)
+    # evalship's report shows what the model got and said, before and after a change.
+    record("input", json.dumps({"category": category, "context": context, "count": count}))
+    record("output", raw[0] if raw else "")
     return names, raw[0] if raw else None
 
 

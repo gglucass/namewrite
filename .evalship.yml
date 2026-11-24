@@ -1,3 +1,6 @@
+gate:
+  fail_on_new_failures: true
+  fail_on_flaws: true
 monitor:
   generate-names:
     - replies

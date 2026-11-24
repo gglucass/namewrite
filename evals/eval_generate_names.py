@@ -1,6 +1,6 @@
 """Evals for generate-names: each case runs the production call, app.generate_names_with_llm, on the real model.
 
-Run them:  .venv/bin/python -m pytest evals/eval_generate_names.py
+Run them:  .venv/bin/python -m pytest evals/eval_generate_names.py --junitxml=eval-results.xml -o junit_family=xunit1
 Plain `pytest` skips this file by its name, so unit tests never call the model.
 """
 
