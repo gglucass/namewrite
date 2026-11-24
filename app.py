@@ -15,6 +15,9 @@ app = Flask(__name__)
 # OpenRouter configuration
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY")
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
+# Names this call for evalship Monitor, which gets it through OpenRouter Broadcast; release is the deployed commit, absent locally.
+_release = os.environ.get("RAILWAY_GIT_COMMIT_SHA") or os.environ.get("RENDER_GIT_COMMIT") or os.environ.get("VERCEL_GIT_COMMIT_SHA")
+EVALSHIP_TRACE = {"call": "generate-names", **({"release": _release} if _release else {})}
 
 # Fallback names when API is unavailable
 FALLBACK_NAMES = {
@@ -60,7 +63,8 @@ Return ONLY a JSON array of strings, nothing else. Example: ["Name1", "Name2", "
                     {"role": "user", "content": prompt}
                 ],
                 "temperature": 0.8,
-                "max_tokens": 200
+                "max_tokens": 200,
+                "trace": EVALSHIP_TRACE
             },
             timeout=30
         )
