@@ -1,0 +1,6 @@
+monitor:
+  generate-names:
+    - replies
+    - json
+    - matches: '^\s*\[\s*"[^"]*"(\s*,\s*"[^"]*")*\s*\]\s*$'
+    - judge: "Are these names that suit the category and context the user asked for?"
