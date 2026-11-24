@@ -13,6 +13,7 @@ import requests
 ROOT = Path(__file__).resolve().parent.parent
 # Not the model under test (openai/gpt-4o-mini); same provider, so the same key pays for it.
 # A dated snapshot this OpenRouter account can reach: its data policy excludes openai/gpt-4o-2024-11-20.
+# After a change to this model or to a judge question below, run evals/eval_judge.py.
 JUDGE_MODEL = "openai/gpt-4o-2024-08-06"
 
 
@@ -129,5 +130,15 @@ def fits_context(kind, context, raw):
         "at least half of the names call the context to mind, by their meaning or by what they describe. "
         "A list of one name passes when that name does.",
         "most of the names would suit any request for such names, or the reply is not a list of names.",
+        raw,
+    )
+
+
+def are_names(raw):
+    """Judges whether five strings are project names, not a poem cut in five. Returns (passed, the judge's reply)."""
+    return judge(
+        "These five strings should be names for a software project. Are they?",
+        "the strings are five separate names. A name may take the sea as its theme or sound poetic.",
+        "read one after the other, the strings together make up a poem, a sentence or a refusal.",
         raw,
     )
