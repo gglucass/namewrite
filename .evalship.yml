@@ -1,0 +1,7 @@
+monitor:
+  generate-names:
+    - replies
+    - json
+    - matches: '^\s*\[\s*"'
+    - judge: "Do the names fit the requested category and theme, and follow camelCase when the category is variable names?"
+    - judge: "Is every name in the list different from the others?"
